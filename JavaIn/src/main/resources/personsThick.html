@@ -11,11 +11,14 @@
 </ul>
 <script>
     get();
-    function get() {
+    async function get() {
         let ul = $('#persons');
-       let persons=[{"id":0,"name":"Иван","surname":"Иванов"},{"id":0,"name":"John","surname":"Doe"}];
+        let persons = await fetch('http://localhost:7070/api/persons', {
+            method: 'GET'
+        })
+            .then(response => response.json());
         persons.forEach(function (item){
-            li = $("<li>");
+            let li = $("<li>");
             li.html(`${item.name} ${item.surname}`);
             ul.append(li);
             console.log(item);

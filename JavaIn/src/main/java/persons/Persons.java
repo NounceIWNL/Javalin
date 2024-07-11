@@ -12,30 +12,37 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public class Persons {
     public static Set<Person> persons = new HashSet<>();
 
-    public static void main(String[] args) {
-        /*
-        Создать страницу , где выводится список Person
-        Имеется форма для добавления нового Person.
-        Предусмотрен способ для удаления данного Person.
+    static {
+        persons.add(new Person("Иван", "Иванов"));
+        persons.add(new Person("John", "Doe"));
+    }
 
-            1. html on bootstrap
-            2. html on tailwind
-            3. list, table, div
-            4. Сервер возвращает json array, клиентская страница
-            с помощью script формирует интерфейс.
-            5. Сервер загружает шаблон страницы ,
-                находит в нем переменную persons,
-                подставляет туда данные,
-                а клиент формирует интерфейс.
-            6. Сервер загружает шаблон страницы и подставляет в него все данные,
-                возвращая пользователю готовую страницу. Шаблонизатор.
+    public static void main(String[] args) {
+        /*Создать страницу, где выводится список persons.Person.
+        Имеется форма для добавления нового persons.Person.
+        Предусмотрен способ для удаления данного persons.Person.
+
+         1. HTML на bootstrap
+         2. HTML на tailwind
+         3. list, table, div
+         4. Сервер возвращает json array, клиентская страница
+         с помощью script формирует интерфейс.
+         5. Сервер загружает шаблон страницы, находит в нем переменную
+         persons, подставляет в нее данные, а клиент формирует интерфейс.
+         6. Сервер загружает шаблон страницы и подставляет в него все данные,
+         возвращая пользователю готовую страницу. Шаблонизатор.
          */
+//        thickClient();
+//        mediumClient();
+        thinClient();
     }
 
     //"Толстый" клиент - клиент только получает данные от сервера
@@ -51,7 +58,7 @@ public class Persons {
     //"Средний" клиент - происходит подстановка переменной в скрипте клиента
     public static void mediumClient() {
         generatePage(persons);
-        Path targetFile = Paths.get("src\\main\\resources\\temp.html");
+        Path targetFile = Paths.get("src/main/resources/temp.html");
         var app = Javalin.create(config ->
                         config.enableCorsForAllOrigins())
                 .get("/api/persons", ctx ->
@@ -69,7 +76,9 @@ public class Persons {
                 .get("/persons", ctx -> {
                     var page = new Page();
                     Map<String, Object> params = new HashMap<>();
+
                     params.put("page", page);
+                    ctx.render("personsThin.jte", params);
                 })
                 .start(7070);
     }
@@ -78,7 +87,7 @@ public class Persons {
     static void generatePage(Set<Person> persons) {
         //Сделать подстановку в файле html
         //Скопировать исходный файл во временный файл
-        Path sourceFile = Paths.get("src/main/resources/personsListVariable.html");
+        Path sourceFile = Paths.get("src/main/resources/personsMedium.html");
         Path targetFile = Paths.get("src/main/resources/temp.html");
         try {
             Files.copy(sourceFile, targetFile,
@@ -99,8 +108,7 @@ public class Persons {
         }
         try {
             content = content.replace("`${persons}`", mapper.writeValueAsString(persons));
-
-//            System.out.println(mapper.writeValueAsString(persons));
+            System.out.println(mapper.writeValueAsString(persons));
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
@@ -111,4 +119,3 @@ public class Persons {
         }
     }
 }
-
