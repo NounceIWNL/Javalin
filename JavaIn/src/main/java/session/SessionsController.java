@@ -26,7 +26,7 @@ public class SessionsController {
         app.get("/login", ctx -> {
             ctx.render("login.jte");
         });
-        
+
         app.post
                 ("/login", ctx -> {
                     String nickname = ctx.formParam("nickname");
